@@ -143,18 +143,23 @@ class RegexFSM:
         return check(self.curr_state, user_inut)
 
 def testing():
+    regex_pattern = "a*4.+hi"
+    regex_compiled = RegexFSM(regex_pattern)
+    print(regex_compiled.check_string("aaaaaa4uhi"))  # True
+    print(regex_compiled.check_string("4uhi"))  # True
+    print(regex_compiled.check_string("meow"))  # False
     new_tests = [
-    ("a*4.+hi", "4!hi", True),      # a*(0) + 4 + .+(!) + hi
+    ("a*4.+hi", "4!hi", True),
 
-    ("b*3.+ok", "3!ok", True),       # b*(0) + 3 + .+(!) + ok
+    ("b*3.+ok", "3!ok", True),
 
-    ("m+n.*p", "mmn123p", True),     # m(1) + n(1) + .*(123) + p
-    ("m+n.*p", "mXYZp", True),       # m(1) + n(0 via *) + .*(XYZ) + p
+    ("m+n.*p", "mmn123p", True),
+    ("m+n.*p", "mXYZp", True),
 
-    ("k*5.+zz", "5Azz", True),       # k*(0) + 5 + .+(A) + zz
+    ("k*5.+zz", "5Azz", True),
 
-    ("c+7.*end", "c7end", True),     # c(1) + 7 + .*(порожньо) + end
-    ("c+7.*end", "cc7Xend", True),   # c(2) + 7 + .*(X) + end
+    ("c+7.*end", "c7end", True),
+    ("c+7.*end", "cc7Xend", True),
 ]
     for pattern, text, expected in new_tests:
         fsm = RegexFSM(pattern)
@@ -162,10 +167,32 @@ def testing():
         status = "Пройшов ✅" if result == expected else "ПОМИЛКА ❌"
         print(f"{status} | Pattern: '{pattern}' | Text: '{text}' | Result: {result} (Expected: {expected})")
 
+
+def main_loop():
+    print("Введіть 'exit' або 'вихід' для завершення.\n")
+    while True:
+        pattern = input("1. Введіть регулярний вираз (regex): ").strip()
+        if pattern.lower() in ['exit', 'вихід', 'quit']:
+            break
+        try:
+            fsm = RegexFSM(pattern)
+            while True:
+                text = input(f"Введіть рядок для перевірки патерна '{pattern}' (або 'back' для зміни regex): ")
+
+                if text.lower() in ['back', 'назад']:
+                    print("-" * 20)
+                    break
+                if text.lower() in ['exit', 'вихід', 'quit']:
+                    return
+
+                result = fsm.check_string(text)
+                status = "✅ ПІДХОДИТЬ" if result else "❌ НЕ ПІДХОДИТЬ"
+                print(f"   >>> Результат: {status}")
+                print()
+        except Exception:
+            print("Помилка при створенні патерна")
+            print("-" * 20)
+
 if __name__ == "__main__":
-    regex_pattern = "a*4.+hi"
-    regex_compiled = RegexFSM(regex_pattern)
-    print(regex_compiled.check_string("aaaaaa4uhi"))  # True
-    print(regex_compiled.check_string("4uhi"))  # True
-    print(regex_compiled.check_string("meow"))  # False
-    testing()
+    # testing()
+    main_loop()
